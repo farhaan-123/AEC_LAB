@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Probability Homework</title>
+<style>
+  :root { --bg:#f5f7fb; --card:#fff; --text:#1f2937; --muted:#6b7280; --accent:#2563eb; --border:#e5e7eb; --error:#dc2626; --hi:#f59e0b; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; background:var(--bg); color:var(--text); line-height:1.5; }
+  header { background:var(--card); border-bottom:1px solid var(--border); }
+  .hi { max-width:900px; margin:0 auto; padding:14px 16px; display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:10px; }
+  .brand { font-weight:700; }
+  nav { display:flex; gap:6px; }
+  nav a { text-decoration:none; color:var(--muted); padding:6px 14px; border-radius:8px; font-weight:600; }
+  nav a.active { background:#eff6ff; color:var(--accent); }
+  main { max-width:900px; margin:0 auto; padding:24px 16px 48px; }
+  h1 { margin:0 0 4px; font-size:1.7rem; } h2 { margin:0 0 12px; font-size:1.1rem; }
+  .sub { color:var(--muted); margin:0 0 20px; }
+  .page { display:none; } .page.active { display:block; }
+  section { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:20px; margin-bottom:20px; }
+  .row { display:flex; flex-wrap:wrap; gap:16px; }
+  .field { flex:1 1 150px; }
+  label { display:block; font-weight:600; margin-bottom:6px; font-size:.9rem; }
+  input[type=number] { width:100%; padding:9px 11px; font-size:1rem; border:1px solid var(--border); border-radius:8px; }
+  input.invalid { border-color:var(--error); }
+  .err { color:var(--error); font-size:.85rem; min-height:1.2em; }
+  .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; }
+  .stat { border:1px solid var(--border); border-radius:10px; padding:12px 14px; background:#fafbff; }
+  .stat .n { font-size:.75rem; color:var(--muted); text-transform:uppercase; letter-spacing:.04em; }
+  .stat .v { font-size:1.5rem; font-weight:700; }
+  .stat .f { font-size:.8rem; color:var(--muted); font-family:ui-monospace,Consolas,monospace; }
+  .chart { width:100%; height:auto; }
+  .legend { display:flex; gap:16px; flex-wrap:wrap; font-size:.9rem; margin-top:8px; }
+  .legend i { display:inline-block; width:12px; height:12px; border-radius:3px; margin-right:6px; vertical-align:-1px; }
+  .answers { background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; padding:14px 16px; }
+  .answers h3 { margin:0 0 8px; font-size:1rem; }
+  .answers ol { margin:0; padding-left:20px; }
+  .muted { color:var(--muted); font-size:.9rem; }
+  .bar:hover { filter: brightness(0.8); }
+  #tip { position:fixed; pointer-events:none; background:#111827; color:#fff; padding:6px 10px; border-radius:6px; font-size:.85rem; white-space:nowrap; transform:translate(-50%,-120%); z-index:10; display:none; }
+</style>
+</head>
+<body>
+<header><div class="hi">
+  <div class="brand">Probability Homework</div>
+  <nav>
+    <a href="#ex1" id="nav-ex1">Exercise 1: Binomial</a>
+    <a href="#ex2" id="nav-ex2">Exercise 2: Poisson</a>
+  </nav>
+</div></header>
+
+<main>
+
+<!-- ============ EXERCISE 1 ============ -->
+<div class="page" id="page-ex1">
+  <h1>Exercise 1: Binomial Distribution</h1>
+  <p class="sub">X ~ Binomial(n, p), configured with n = 15 and p = 0.6.</p>
+
+  <section>
+    <h2>Inputs</h2>
+    <div class="row">
+      <div class="field"><label for="b-n">Trials (n)</label><input type="number" id="b-n" value="15" step="1" min="1"><div class="err" id="b-n-e"></div></div>
+      <div class="field"><label for="b-p">Success probability (p)</label><input type="number" id="b-p" value="0.6" step="0.01" min="0" max="1"><div class="err" id="b-p-e"></div></div>
+      <div class="field"><label for="b-k">Exactly k: P(X = k)</label><input type="number" id="b-k" value="9" step="1" min="0"><div class="err" id="b-k-e"></div></div>
+      <div class="field"><label for="b-c">At most c: P(X ≤ c)</label><input type="number" id="b-c" value="10" step="1" min="0"><div class="err" id="b-c-e"></div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Results</h2>
+    <div class="cards">
+      <div class="stat"><div class="n">Mean</div><div class="v" id="b-mean">–</div><div class="f">np</div></div>
+      <div class="stat"><div class="n">Variance</div><div class="v" id="b-var">–</div><div class="f">np(1 − p)</div></div>
+      <div class="stat"><div class="n" id="b-pk-n">P(X = k)</div><div class="v" id="b-pk">–</div><div class="f">C(n,k) p^k (1−p)^(n−k)</div></div>
+      <div class="stat"><div class="n" id="b-cdf-n">P(X ≤ c)</div><div class="v" id="b-cdf">–</div><div class="f">Σ P(X = i), i = 0..c</div></div>
+      <div class="stat"><div class="n" id="b-gt-n">P(X &gt; c)</div><div class="v" id="b-gt">–</div><div class="f">1 − P(X ≤ c)</div></div>
+      <div class="stat"><div class="n">Most likely value</div><div class="v" id="b-mode">–</div><div class="f">highest PMF bar</div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>PMF graph</h2>
+    <div id="b-chart"></div>
+    <div class="muted">Orange bar = highest probability. Blue bars = values of k included in P(X ≤ c) are darker.</div>
+  </section>
+
+  <section class="answers">
+    <h3>Answers (n = 15, p = 0.6)</h3>
+    <ol>
+      <li>Mean = np = <b>9</b>; Variance = np(1−p) = <b>3.6</b>.</li>
+      <li>P(X = 9) = <b>0.206598</b> (about 20.66%).</li>
+      <li>P(X ≤ 10) = <b>0.782722</b> (about 78.27%), so P(X &gt; 10) = 1 − 0.782722 = <b>0.217278</b>.</li>
+      <li>The PMF is highest at <b>k = 9</b> (probability ≈ 0.2066). The tallest bars are in the region k = 8 to 10, around the mean.</li>
+      <li><b>Inference:</b> The distribution is unimodal and slightly left-skewed (p &gt; 0.5), with its peak at the mean (9). About 78% of outcomes fall at 10 or fewer successes, and very large (14 or 15) or very small (below 5) counts are rare. Values cluster within roughly one standard deviation (σ ≈ 1.9) of 9.</li>
+    </ol>
+  </section>
+</div>
+
+<!-- ============ EXERCISE 2 ============ -->
+<div class="page" id="page-ex2">
+  <h1>Exercise 2: Poisson Distribution</h1>
+  <p class="sub">X ~ Poisson(λ), AI-based monitoring system with an average of λ = 6 events.</p>
+
+  <section>
+    <h2>Inputs</h2>
+    <div class="row">
+      <div class="field"><label for="p-l">Average events (λ)</label><input type="number" id="p-l" value="6" step="0.1" min="0.1"><div class="err" id="p-l-e"></div></div>
+      <div class="field"><label for="p-k">Exactly k: P(X = k)</label><input type="number" id="p-k" value="8" step="1" min="0"><div class="err" id="p-k-e"></div></div>
+      <div class="field"><label for="p-c">At most c: P(X ≤ c)</label><input type="number" id="p-c" value="5" step="1" min="0"><div class="err" id="p-c-e"></div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Results</h2>
+    <div class="cards">
+      <div class="stat"><div class="n">Mean</div><div class="v" id="p-mean">–</div><div class="f">λ</div></div>
+      <div class="stat"><div class="n">Variance</div><div class="v" id="p-var">–</div><div class="f">λ</div></div>
+      <div class="stat"><div class="n" id="p-pk-n">P(X = k)</div><div class="v" id="p-pk">–</div><div class="f">e^(−λ) λ^k / k!</div></div>
+      <div class="stat"><div class="n" id="p-cdf-n">P(X ≤ c)</div><div class="v" id="p-cdf">–</div><div class="f">Σ P(X = i), i = 0..c</div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>PMF for the chosen λ</h2>
+    <div id="p-chart"></div>
+  </section>
+
+  <section>
+    <h2>Comparison: λ = 2, 6 and 10</h2>
+    <div id="p-compare"></div>
+    <div class="legend">
+      <span><i style="background:#16a34a"></i>λ = 2</span>
+      <span><i style="background:#2563eb"></i>λ = 6</span>
+      <span><i style="background:#dc2626"></i>λ = 10</span>
+    </div>
+  </section>
+
+  <section class="answers">
+    <h3>Answers (λ = 6)</h3>
+    <ol>
+      <li>Mean = λ = <b>6</b>; Variance = λ = <b>6</b> (σ ≈ 2.449).</li>
+      <li>P(X = 8) = <b>0.103258</b> (about 10.33%).</li>
+      <li>P(X ≤ 5) = <b>0.445680</b> (about 44.57%).</li>
+      <li>Comparison: λ = 2 peaks at k = 1 and 2 (≈ 0.2707 each) and is sharply right-skewed. λ = 6 peaks at k = 5 and 6 (≈ 0.1606 each) and is moderately spread. λ = 10 peaks at k = 9 and 10 (≈ 0.1251 each) and is wide and flat. When λ is a whole number the two values k = λ−1 and k = λ tie for the highest bar.</li>
+      <li><b>Inference:</b> As λ increases, the distribution shifts to the right (the centre moves to λ), becomes wider (variance = λ, so σ grows from 1.41 to 2.45 to 3.16) and the peak gets lower because the same total probability of 1 is spread over more values. The shape also becomes more symmetric and bell-like, approaching a normal distribution, while small λ gives a skewed shape that piles up near 0.</li>
+    </ol>
+  </section>
+</div>
+
+</main>
+
+<script>
+  // ---------- navigation ----------
+  const pages = { ex1: 'page-ex1', ex2: 'page-ex2' };
+  function showPage() {
+    const name = pages[(location.hash || '#ex1').slice(1)] ? (location.hash || '#ex1').slice(1) : 'ex1';
+    for (const k in pages) {
+      document.getElementById(pages[k]).classList.toggle('active', k === name);
+      document.getElementById('nav-' + k).classList.toggle('active', k === name);
+    }
+  }
+  window.addEventListener('hashchange', showPage);
+  showPage();
+
+  // ---------- helpers ----------
+  const $ = id => document.getElementById(id);
+  const isInt = t => /^\d+$/.test(String(t).trim());
+  const fmt = x => x === 0 ? '0' : (x < 1e-6 ? x.toExponential(3) : x.toFixed(6));
+  const num = x => Number(x.toFixed(4)).toString();
+
+  function logChoose(n, k) { k = Math.min(k, n - k); let s = 0; for (let i = 1; i <= k; i++) s += Math.log((n - k + i) / i); return s; }
+  function binPMF(n, p, k) {
+    if (p === 0) return k === 0 ? 1 : 0;
+    if (p === 1) return k === n ? 1 : 0;
+    return Math.exp(logChoose(n, k) + k * Math.log(p) + (n - k) * Math.log(1 - p));
+  }
+  function logFact(k) { let s = 0; for (let i = 2; i <= k; i++) s += Math.log(i); return s; }
+  function poiPMF(l, k) { return Math.exp(-l + k * Math.log(l) - logFact(k)); }
+
+  function bad(id, errId, msg) { $(id).classList.add('invalid'); $(errId).textContent = msg; }
+  function good(id, errId) { $(id).classList.remove('invalid'); $(errId).textContent = ''; }
+
+  // ---------- SVG bar chart ----------
+  // series: [{values:[...], color, opacity}], highlight: index to colour orange (single series only)
+  function chartSVG(series, xs, opts = {}) {
+    const W = 760, H = 300, L = 48, R = 12, T = 12, B = 36;
+    const iw = W - L - R, ih = H - T - B;
+    const ymax = Math.max(...series.flatMap(s => s.values)) * 1.12 || 1;
+    const groupW = iw / xs.length;
+    let svg = `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="PMF chart">`;
+    for (let i = 0; i <= 4; i++) {
+      const y = T + ih - (ih * i / 4), v = ymax * i / 4;
+      svg += `<line x1="${L}" x2="${W - R}" y1="${y}" y2="${y}" stroke="#e5e7eb"/>`;
+      svg += `<text x="${L - 6}" y="${y + 4}" font-size="11" text-anchor="end" fill="#6b7280">${v.toFixed(2)}</text>`;
+    }
+    const step = xs.length > 25 ? 2 : 1;
+    xs.forEach((x, i) => {
+      const gx = L + i * groupW;
+      series.forEach((s, j) => {
+        const bw = (groupW * 0.8) / series.length;
+        const h = ih * s.values[i] / ymax;
+        let color = s.color;
+        if (s.colors) color = s.colors[i];
+        svg += `<rect x="${gx + groupW * 0.1 + j * bw}" y="${T + ih - h}" width="${bw}" height="${h}" fill="${color}" rx="1" class="bar" data-tip="${(s.name ? s.name + ', ' : '')}X = ${x}, P(X=${x}) = ${s.values[i].toFixed(6)}"></rect>`;
+      });
+      if (i % step === 0) svg += `<text x="${gx + groupW / 2}" y="${H - B + 16}" font-size="11" text-anchor="middle" fill="#6b7280">${x}</text>`;
+    });
+    svg += `<text x="${L + iw / 2}" y="${H - 4}" font-size="12" text-anchor="middle" fill="#1f2937">${opts.xLabel || 'X'}</text>`;
+    svg += `<text x="12" y="${T + ih / 2}" font-size="12" text-anchor="middle" fill="#1f2937" transform="rotate(-90 12 ${T + ih / 2})">Probability P(X)</text>`;
+    // dashed vertical reference line at the mean (bar k is centred at k + 0.5 slots)
+    if (opts.mean != null) {
+      const mx = L + (opts.mean + 0.5) * groupW;
+      svg += `<line x1="${mx}" x2="${mx}" y1="${T}" y2="${T + ih}" stroke="#dc2626" stroke-width="2" stroke-dasharray="6 4" pointer-events="none"/>`;
+      const right = mx > W - 120;
+      svg += `<text x="${right ? mx - 6 : mx + 6}" y="${T + 12}" font-size="12" font-weight="600" text-anchor="${right ? 'end' : 'start'}" fill="#dc2626">Mean = ${Number(opts.mean.toFixed(4))}</text>`;
+    }
+    return svg + '</svg>';
+  }
+
+  // ---------- Exercise 1: Binomial ----------
+  function updateBinomial() {
+    ['b-n', 'b-p', 'b-k', 'b-c'].forEach(id => good(id, id + '-e'));
+    const nT = $('b-n').value, pT = $('b-p').value, kT = $('b-k').value, cT = $('b-c').value;
+    const p = parseFloat(pT);
+    let ok = true;
+    if (!isInt(nT) || +nT < 1) { bad('b-n', 'b-n-e', 'n must be a positive integer'); ok = false; }
+    if (pT.trim() === '' || isNaN(p) || p < 0 || p > 1) { bad('b-p', 'b-p-e', 'p must be between 0 and 1'); ok = false; }
+    if (!ok) return;
+    const n = +nT;
+    if (!isInt(kT) || +kT > n) { bad('b-k', 'b-k-e', '0 ≤ k ≤ ' + n); ok = false; }
+    if (!isInt(cT) || +cT > n) { bad('b-c', 'b-c-e', '0 ≤ c ≤ ' + n); ok = false; }
+
+    const pmf = Array.from({ length: n + 1 }, (_, k) => binPMF(n, p, k));
+    const mode = pmf.indexOf(Math.max(...pmf));
+    $('b-mean').textContent = num(n * p);
+    $('b-var').textContent = num(n * p * (1 - p));
+    $('b-mode').textContent = 'k = ' + mode;
+    if (ok) {
+      const k = +kT, c = +cT;
+      $('b-pk-n').textContent = 'P(X = ' + k + ')';
+      $('b-pk').textContent = fmt(pmf[k]);
+      $('b-cdf-n').textContent = 'P(X ≤ ' + c + ')';
+      const le = Math.min(1, pmf.slice(0, c + 1).reduce((a, b) => a + b, 0));
+      $('b-cdf').textContent = fmt(le);
+      $('b-gt-n').textContent = 'P(X > ' + c + ')';
+      $('b-gt').textContent = fmt(Math.max(0, 1 - le));
+    }
+    const c = isInt(cT) && +cT <= n ? +cT : -1;
+    const colors = pmf.map((_, k) => k === mode ? '#f59e0b' : (k <= c ? '#1d4ed8' : '#93c5fd'));
+    $('b-chart').innerHTML = chartSVG([{ values: pmf, colors }], pmf.map((_, k) => k),
+      { mean: n * p, xLabel: 'Number of successes X' });
+  }
+  ['b-n', 'b-p', 'b-k', 'b-c'].forEach(id => $(id).addEventListener('input', updateBinomial));
+
+  // ---------- Exercise 2: Poisson ----------
+  const PMAX = 25;
+  function updatePoisson() {
+    ['p-l', 'p-k', 'p-c'].forEach(id => good(id, id + '-e'));
+    const lT = $('p-l').value, kT = $('p-k').value, cT = $('p-c').value;
+    const l = parseFloat(lT);
+    if (lT.trim() === '' || isNaN(l) || l <= 0) { bad('p-l', 'p-l-e', 'λ must be greater than 0'); return; }
+    let ok = true;
+    if (!isInt(kT)) { bad('p-k', 'p-k-e', 'k must be an integer ≥ 0'); ok = false; }
+    if (!isInt(cT)) { bad('p-c', 'p-c-e', 'c must be an integer ≥ 0'); ok = false; }
+
+    $('p-mean').textContent = num(l);
+    $('p-var').textContent = num(l);
+    if (ok) {
+      const k = +kT, c = +cT;
+      $('p-pk-n').textContent = 'P(X = ' + k + ')';
+      $('p-pk').textContent = fmt(poiPMF(l, k));
+      let s = 0; for (let i = 0; i <= c; i++) s += poiPMF(l, i);
+      $('p-cdf-n').textContent = 'P(X ≤ ' + c + ')';
+      $('p-cdf').textContent = fmt(Math.min(s, 1));
+    }
+    const top = Math.max(PMAX, Math.ceil(l + 5 * Math.sqrt(l)));
+    const xs = Array.from({ length: top + 1 }, (_, i) => i);
+    const vals = xs.map(k => poiPMF(l, k));
+    const peak = Math.max(...vals);
+    $('p-chart').innerHTML = chartSVG([{ values: vals, colors: vals.map(v => Math.abs(v - peak) < 1e-12 ? '#f59e0b' : '#2563eb') }], xs,
+      { mean: l, xLabel: 'Number of events X' });
+  }
+  ['p-l', 'p-k', 'p-c'].forEach(id => $(id).addEventListener('input', updatePoisson));
+
+  // Fixed comparison chart: λ = 2, 6, 10
+  (function () {
+    const xs = Array.from({ length: 26 }, (_, i) => i);
+    const mk = (l, color) => ({ values: xs.map(k => poiPMF(l, k)), color, name: 'λ = ' + l });
+    $('p-compare').innerHTML = chartSVG([mk(2, '#16a34a'), mk(6, '#2563eb'), mk(10, '#dc2626')], xs,
+      { xLabel: 'Number of events X' });
+  })();
+
+  // ---------- tooltip (X = value, P(X=value) = probability) ----------
+  const tip = document.createElement('div');
+  tip.id = 'tip';
+  document.body.appendChild(tip);
+  function showTip(e) {
+    const bar = e.target.closest && e.target.closest('.bar');
+    if (!bar) { tip.style.display = 'none'; return; }
+    tip.textContent = bar.dataset.tip;
+    tip.style.left = e.clientX + 'px';
+    tip.style.top = e.clientY + 'px';
+    tip.style.display = 'block';
+  }
+  document.addEventListener('mousemove', showTip);
+  document.addEventListener('click', showTip);   // touch screens
+  document.addEventListener('mouseleave', () => tip.style.display = 'none');
+
+  updateBinomial();
+  updatePoisson();
+</script>
+</body>
+</html>

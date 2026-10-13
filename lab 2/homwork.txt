@@ -1,0 +1,22 @@
+import random
+
+# Roll a die 1000 times
+rolls = [random.randint(1, 6) for _ in range(1000)]
+
+#Counter for rolls greater than 3 and rolls that are even and greater than 3
+count_gt_3 = 0
+count_even_and_gt_3 = 0
+
+# Calculate the counts
+for roll in rolls:
+    if roll > 3:
+        count_gt_3 += 1
+        if roll % 2 == 0:
+            count_even_and_gt_3 += 1
+
+# Calculate the conditional probability P(Even | roll > 3)
+if count_gt_3 > 0:
+    probability = count_even_and_gt_3 / count_gt_3
+    print(f"P(Even | roll > 3) = {probability:.2%}")
+else:
+    print("No rolls were > 3")

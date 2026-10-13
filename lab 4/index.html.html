@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Discrete Probability Distributions</title>
+<style>
+  :root {
+    --bg: #f5f7fb;
+    --card: #ffffff;
+    --text: #1f2937;
+    --muted: #6b7280;
+    --accent: #2563eb;
+    --border: #e5e7eb;
+    --error: #dc2626;
+    --ok: #16a34a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+  }
+
+  /* ----- header / navigation ----- */
+  header {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+  }
+  .header-inner {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 14px 16px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .brand { font-weight: 700; font-size: 1.1rem; }
+  nav { display: flex; gap: 6px; }
+  nav a {
+    text-decoration: none;
+    color: var(--muted);
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-weight: 600;
+  }
+  nav a:hover { background: #f3f4f6; color: var(--text); }
+  nav a.active { background: #eff6ff; color: var(--accent); }
+
+  main { max-width: 860px; margin: 0 auto; padding: 24px 16px 48px; }
+  h1 { margin: 0 0 4px; font-size: 1.8rem; }
+  h2 { margin: 0 0 12px; font-size: 1.15rem; }
+  .subtitle { color: var(--muted); margin: 0 0 24px; }
+  .page { display: none; }
+  .page.active { display: block; }
+
+  section {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+
+  /* ----- home ----- */
+  .dist-list { list-style: none; padding: 0; margin: 0; }
+  .dist-list li {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .dist-list li:last-child { border-bottom: none; }
+  .tag { font-size: 0.8rem; color: var(--muted); }
+  .tag.ready { color: var(--ok); font-weight: 600; }
+  .home-link { color: var(--accent); font-weight: 600; text-decoration: none; }
+
+  /* ----- inputs ----- */
+  .inputs { display: flex; flex-wrap: wrap; gap: 20px; }
+  .field { flex: 1 1 220px; }
+  label { display: block; font-weight: 600; margin-bottom: 6px; }
+  input[type="number"] {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 1rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+  input[type="number"]:focus { outline: 2px solid var(--accent); border-color: var(--accent); }
+  input.invalid { border-color: var(--error); }
+  .hint { font-size: 0.85rem; color: var(--muted); margin-top: 4px; }
+  .error { font-size: 0.85rem; color: var(--error); margin-top: 4px; min-height: 1.2em; }
+  .selected {
+    margin-top: 16px;
+    padding: 12px 14px;
+    background: #eff6ff;
+    border-radius: 8px;
+    font-size: 1.05rem;
+  }
+  .selected strong { color: var(--accent); }
+
+  /* ----- stats ----- */
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+  .stat {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    background: #fafbff;
+  }
+  .stat .name { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+  .stat .value { font-size: 1.6rem; font-weight: 700; margin: 4px 0; }
+  .stat .formula { font-size: 0.85rem; color: var(--muted); font-family: ui-monospace, Consolas, monospace; }
+  .check { margin-top: 14px; font-size: 0.95rem; color: var(--ok); }
+
+  /* ----- PMF ----- */
+  .formula-box {
+    font-family: ui-monospace, Consolas, monospace;
+    background: #f3f4f6;
+    padding: 12px 14px;
+    border-radius: 8px;
+    margin: 14px 0;
+    overflow-x: auto;
+  }
+  .result { font-size: 1.4rem; font-weight: 700; color: var(--accent); margin: 8px 0; }
+  .hidden { display: none; }
+
+  /* ----- CDF ----- */
+  .two-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-top: 14px; }
+
+  /* ----- chart ----- */
+  .chart-wrap { position: relative; }
+  .chart-wrap svg { width: 100%; height: auto; display: block; }
+  .bar { fill: #3b82f6; }
+  .bar:hover { fill: #1d4ed8; }
+  .tooltip {
+    position: absolute;
+    pointer-events: none;
+    background: #111827;
+    color: #fff;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    transform: translate(-50%, -110%);
+    z-index: 5;
+  }
+  .chart-note { font-size: 0.85rem; color: var(--muted); margin-top: 6px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="brand">Discrete Probability Distributions</div>
+    <nav>
+      <a href="#home" id="nav-home">Home</a>
+      <a href="#binomial" id="nav-binomial">Binomial</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <!-- ================= HOME ================= -->
+  <div class="page" id="page-home">
+    <h1>Discrete Probability Distributions</h1>
+    <p class="subtitle">AIML Laboratory: explore how common discrete distributions behave.</p>
+    <section>
+      <h2>Distributions</h2>
+      <ul class="dist-list">
+        <li><span>1. Binomial Distribution</span> <a class="home-link" href="#binomial">Open →</a></li>
+        <li><span>2. Poisson Distribution</span> <span class="tag">Coming soon</span></li>
+        <li><span>3. Geometric Distribution</span> <span class="tag">Coming soon</span></li>
+      </ul>
+    </section>
+  </div>
+
+  <!-- ================= BINOMIAL ================= -->
+  <div class="page" id="page-binomial">
+    <h1>Binomial Distribution</h1>
+    <p class="subtitle">X ~ Binomial(n, p): the number of successes in n independent trials, each with success probability p.</p>
+
+    <!-- Inputs -->
+    <section>
+      <h2>Inputs</h2>
+      <div class="inputs">
+        <div class="field">
+          <label for="n-input">Number of trials (n)</label>
+          <input type="number" id="n-input" value="20" step="1" min="1">
+          <div class="hint">A positive integer (1, 2, 3, ...)</div>
+          <div class="error" id="n-error"></div>
+        </div>
+        <div class="field">
+          <label for="p-input">Probability of success (p)</label>
+          <input type="number" id="p-input" value="0.35" step="0.01" min="0" max="1">
+          <div class="hint">A number between 0 and 1</div>
+          <div class="error" id="p-error"></div>
+        </div>
+      </div>
+      <div class="selected" id="selected">
+        Selected: <strong>n = 20</strong>, <strong>p = 0.35</strong>
+      </div>
+    </section>
+
+    <!-- Statistics -->
+    <section>
+      <h2>Binomial Statistics</h2>
+      <div class="cards">
+        <div class="stat">
+          <div class="name">Mean</div>
+          <div class="value" id="stat-mean">–</div>
+          <div class="formula">np</div>
+        </div>
+        <div class="stat">
+          <div class="name">Variance</div>
+          <div class="value" id="stat-variance">–</div>
+          <div class="formula">np(1 − p)</div>
+        </div>
+        <div class="stat">
+          <div class="name">Std. deviation</div>
+          <div class="value" id="stat-sd">–</div>
+          <div class="formula">√Variance</div>
+        </div>
+        <div class="stat">
+          <div class="name">Second moment E[X²]</div>
+          <div class="value" id="stat-second">–</div>
+          <div class="formula">Variance + Mean²</div>
+        </div>
+        <div class="stat">
+          <div class="name">Skewness</div>
+          <div class="value" id="stat-skew">–</div>
+          <div class="formula">(1 − 2p) / √(np(1 − p))</div>
+        </div>
+      </div>
+      <div class="check hidden" id="default-check"></div>
+    </section>
+
+    <!-- PMF -->
+    <section>
+      <h2>PMF Calculator: P(X = k)</h2>
+      <div class="field" style="max-width: 260px;">
+        <label for="k-input">Number of successes (k)</label>
+        <input type="number" id="k-input" value="7" step="1" min="0">
+        <div class="hint" id="k-hint">An integer from 0 to n</div>
+        <div class="error" id="k-error"></div>
+      </div>
+
+      <div class="formula-box">P(X=k) = C(n,k) p^k (1-p)^(n-k)</div>
+      <div class="formula-box hidden" id="pmf-substituted"></div>
+
+      <div class="result" id="pmf-result"></div>
+      <div id="pmf-meaning"></div>
+    </section>
+
+    <!-- CDF (Prompt 5) -->
+    <section>
+      <h2>CDF Calculator: P(X ≤ k)</h2>
+      <div class="field" style="max-width: 260px;">
+        <label for="c-input">Number of successes (k)</label>
+        <input type="number" id="c-input" value="7" step="1" min="0">
+        <div class="hint" id="c-hint">An integer from 0 to n</div>
+        <div class="error" id="c-error"></div>
+      </div>
+      <div class="two-cards">
+        <div class="stat">
+          <div class="name" id="cdf-le-name">P(X ≤ k)</div>
+          <div class="value" id="cdf-le">–</div>
+          <div class="formula">Σ P(X = i), i = 0..k</div>
+        </div>
+        <div class="stat">
+          <div class="name" id="cdf-gt-name">P(X &gt; k)</div>
+          <div class="value" id="cdf-gt">–</div>
+          <div class="formula">1 − P(X ≤ k)</div>
+        </div>
+      </div>
+      <p id="cdf-meaning" style="margin-bottom:0;">P(X ≤ k) means the probability of getting k or fewer successes.</p>
+    </section>
+
+    <!-- PMF graph (Prompt 6) -->
+    <section>
+      <h2>Binomial PMF Graph</h2>
+      <div class="chart-wrap" id="chart-wrap">
+        <div id="chart"></div>
+        <div class="tooltip hidden" id="tooltip"></div>
+      </div>
+      <div class="chart-note">Hover over a bar to see its probability. The dashed line marks the mean (np).</div>
+    </section>
+  </div>
+
+</main>
+
+<script>
+  // ---------- navigation ----------
+  const pages = { home: 'page-home', binomial: 'page-binomial' };
+
+  function showPage() {
+    const name = (location.hash || '#home').slice(1);
+    const page = pages[name] ? name : 'home';
+    Object.keys(pages).forEach(key => {
+      document.getElementById(pages[key]).classList.toggle('active', key === page);
+      document.getElementById('nav-' + key).classList.toggle('active', key === page);
+    });
+    window.scrollTo(0, 0);
+  }
+  window.addEventListener('hashchange', showPage);
+  showPage();
+
+  // ---------- Binomial module ----------
+  const nInput = document.getElementById('n-input');
+  const pInput = document.getElementById('p-input');
+  const kInput = document.getElementById('k-input');
+
+  const nError = document.getElementById('n-error');
+  const pError = document.getElementById('p-error');
+  const kError = document.getElementById('k-error');
+
+  const statIds = ['mean', 'variance', 'sd', 'second', 'skew'];
+
+  function isPositiveInteger(text) {
+    return /^\d+$/.test(text.trim()) && parseInt(text, 10) >= 1;
+  }
+
+  function isIntegerText(text) {
+    return /^\d+$/.test(text.trim());
+  }
+
+  function round(x, d = 4) {
+    return Number(x.toFixed(d)).toString();
+  }
+
+  // Exact C(n,k) using BigInt
+  function choose(n, k) {
+    k = Math.min(k, n - k);
+    let result = 1n;
+    for (let i = 1; i <= k; i++) {
+      result = result * BigInt(n - k + i) / BigInt(i);
+    }
+    return result;
+  }
+
+  function formatBig(big) {
+    const s = big.toString();
+    if (s.length <= 15) return s;
+    return s[0] + '.' + s.slice(1, 5) + 'e+' + (s.length - 1);
+  }
+
+  // log C(n,k), for a numerically stable PMF
+  function logChoose(n, k) {
+    k = Math.min(k, n - k);
+    let s = 0;
+    for (let i = 1; i <= k; i++) s += Math.log((n - k + i) / i);
+    return s;
+  }
+
+  function binomialPMF(n, p, k) {
+    if (p === 0) return k === 0 ? 1 : 0;
+    if (p === 1) return k === n ? 1 : 0;
+    return Math.exp(logChoose(n, k) + k * Math.log(p) + (n - k) * Math.log(1 - p));
+  }
+
+  function formatProb(x) {
+    if (x === 0) return '0';
+    if (x < 0.000001) return x.toExponential(4);
+    return x.toFixed(6);
+  }
+
+  function readInputs() {
+    let nValid = true, pValid = true;
+    const nText = nInput.value;
+    const pText = pInput.value;
+
+    nError.textContent = '';
+    pError.textContent = '';
+    nInput.classList.remove('invalid');
+    pInput.classList.remove('invalid');
+
+    if (!isPositiveInteger(nText)) {
+      nValid = false;
+      nError.textContent = 'n must be a positive integer (1, 2, 3, ...).';
+      nInput.classList.add('invalid');
+    }
+
+    const p = parseFloat(pText);
+    if (pText.trim() === '' || isNaN(p) || p < 0 || p > 1) {
+      pValid = false;
+      pError.textContent = 'p must be a number between 0 and 1.';
+      pInput.classList.add('invalid');
+    }
+
+    return {
+      valid: nValid && pValid,
+      n: nValid ? parseInt(nText, 10) : null,
+      p: pValid ? p : null
+    };
+  }
+
+  function clearStats() {
+    statIds.forEach(id => document.getElementById('stat-' + id).textContent = '–');
+    document.getElementById('default-check').classList.add('hidden');
+  }
+
+  function renderSelected(n, p) {
+    document.getElementById('selected').innerHTML =
+      'Selected: <strong>n = ' + n + '</strong>, <strong>p = ' + p + '</strong>';
+  }
+
+  function renderStats(n, p) {
+    const mean = n * p;
+    const variance = n * p * (1 - p);
+    const sd = Math.sqrt(variance);
+    const second = variance + mean * mean;
+
+    document.getElementById('stat-mean').textContent = round(mean);
+    document.getElementById('stat-variance').textContent = round(variance);
+    document.getElementById('stat-sd').textContent = round(sd);
+    document.getElementById('stat-second').textContent = round(second);
+    // Skewness is undefined when variance = 0 (p = 0 or p = 1)
+    document.getElementById('stat-skew').textContent =
+      variance === 0 ? 'Undefined' : round((1 - 2 * p) / sd);
+
+    const check = document.getElementById('default-check');
+    if (n === 20 && Math.abs(p - 0.35) < 1e-12) {
+      const ok = Math.abs(mean - 7) < 1e-9 && Math.abs(variance - 4.55) < 1e-9;
+      check.textContent = ok
+        ? '✔ Verified for n = 20, p = 0.35: mean = 7 and variance = 4.55.'
+        : '✘ Check failed: expected mean = 7 and variance = 4.55.';
+      check.classList.remove('hidden');
+    } else {
+      check.classList.add('hidden');
+    }
+  }
+
+  function renderPMF(n, p) {
+    const kText = kInput.value;
+    const sub = document.getElementById('pmf-substituted');
+    const result = document.getElementById('pmf-result');
+    const meaning = document.getElementById('pmf-meaning');
+
+    kInput.max = n;
+    document.getElementById('k-hint').textContent = 'An integer from 0 to ' + n;
+    kError.textContent = '';
+    kInput.classList.remove('invalid');
+    sub.classList.add('hidden');
+    result.textContent = '';
+    meaning.textContent = '';
+
+    const kNum = Number(kText);
+    if (kText.trim() === '' || !isIntegerText(kText) || kNum < 0 || kNum > n) {
+      kError.textContent = 'k must be an integer with 0 ≤ k ≤ ' + n + '.';
+      kInput.classList.add('invalid');
+      return;
+    }
+
+    const k = kNum;
+    const prob = binomialPMF(n, p, k);
+
+    sub.textContent =
+      'P(X=' + k + ') = C(' + n + ',' + k + ') × ' + p + '^' + k +
+      ' × ' + round(1 - p, 10) + '^' + (n - k) +
+      '   where C(' + n + ',' + k + ') = ' + formatBig(choose(n, k));
+    sub.classList.remove('hidden');
+
+    result.textContent = 'P(X = ' + k + ') = ' + formatProb(prob) +
+      '  (' + (prob * 100).toFixed(2) + '%)';
+
+    meaning.textContent =
+      'This means that in ' + n + ' trials, each with success probability ' + p +
+      ', the chance of getting exactly ' + k + ' success' + (k === 1 ? '' : 'es') +
+      ' is about ' + (prob * 100).toFixed(2) + '%.';
+  }
+
+  // ---------- CDF (Prompt 5) ----------
+  const cInput = document.getElementById('c-input');
+  const cError = document.getElementById('c-error');
+
+  function renderCDF(n, p) {
+    cError.textContent = '';
+    cInput.classList.remove('invalid');
+    document.getElementById('c-hint').textContent = 'An integer from 0 to ' + n;
+    cInput.max = n;
+
+    const text = cInput.value;
+    const k = Number(text);
+    if (text.trim() === '' || !isIntegerText(text) || k < 0 || k > n) {
+      cError.textContent = 'k must be an integer with 0 ≤ k ≤ ' + n + '.';
+      cInput.classList.add('invalid');
+      clearCDF();
+      return;
+    }
+
+    let le = 0;
+    for (let i = 0; i <= k; i++) le += binomialPMF(n, p, i);
+    le = Math.min(1, le);
+    const gt = Math.max(0, 1 - le);
+
+    document.getElementById('cdf-le-name').textContent = 'P(X ≤ ' + k + ')';
+    document.getElementById('cdf-gt-name').textContent = 'P(X > ' + k + ')';
+    document.getElementById('cdf-le').textContent = formatProb(le);
+    document.getElementById('cdf-gt').textContent = formatProb(gt);
+    document.getElementById('cdf-meaning').textContent =
+      'P(X ≤ ' + k + ') means the probability of getting ' + k + ' or fewer successes.';
+  }
+
+  function clearCDF() {
+    document.getElementById('cdf-le').textContent = '–';
+    document.getElementById('cdf-gt').textContent = '–';
+  }
+
+  // ---------- PMF bar chart (Prompt 6) ----------
+  const chartEl = document.getElementById('chart');
+  const tooltip = document.getElementById('tooltip');
+  const chartWrap = document.getElementById('chart-wrap');
+
+  function renderChart(n, p) {
+    const W = 760, H = 320, L = 56, R = 16, T = 20, B = 48;
+    const iw = W - L - R, ih = H - T - B;
+    const probs = [];
+    for (let k = 0; k <= n; k++) probs.push(binomialPMF(n, p, k));
+    const ymax = Math.max(...probs) * 1.15 || 1;
+    const slot = iw / (n + 1);
+    const barW = Math.max(1, slot * 0.8);
+    const labelStep = Math.ceil((n + 1) / 25);
+
+    let svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Binomial PMF bar chart">';
+
+    // grid + y axis
+    for (let i = 0; i <= 5; i++) {
+      const y = T + ih - ih * i / 5;
+      svg += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + y + '" y2="' + y + '" stroke="#e5e7eb"/>';
+      svg += '<text x="' + (L - 8) + '" y="' + (y + 4) + '" font-size="11" text-anchor="end" fill="#6b7280">' +
+             (ymax * i / 5).toFixed(3) + '</text>';
+    }
+
+    // bars
+    probs.forEach((pr, k) => {
+      const h = ih * pr / ymax;
+      const x = L + k * slot + (slot - barW) / 2;
+      svg += '<rect class="bar" data-k="' + k + '" data-p="' + pr + '" x="' + x + '" y="' + (T + ih - h) +
+             '" width="' + barW + '" height="' + h + '" rx="1"/>';
+      if (k % labelStep === 0) {
+        svg += '<text x="' + (L + k * slot + slot / 2) + '" y="' + (T + ih + 16) +
+               '" font-size="11" text-anchor="middle" fill="#6b7280">' + k + '</text>';
+      }
+    });
+
+    // axes titles
+    svg += '<text x="' + (L + iw / 2) + '" y="' + (H - 8) + '" font-size="12" text-anchor="middle" fill="#1f2937">Number of successes X</text>';
+    svg += '<text x="14" y="' + (T + ih / 2) + '" font-size="12" text-anchor="middle" fill="#1f2937" transform="rotate(-90 14 ' +
+           (T + ih / 2) + ')">Probability P(X)</text>';
+
+    // dashed mean line (bar for k is centred at k + 0.5 slots)
+    const mean = n * p;
+    const mx = L + (mean + 0.5) * slot;
+    svg += '<line x1="' + mx + '" x2="' + mx + '" y1="' + T + '" y2="' + (T + ih) +
+           '" stroke="#dc2626" stroke-width="2" stroke-dasharray="6 4" pointer-events="none"/>';
+    const anchor = mx > W - 120 ? 'end' : 'start';
+    const tx = anchor === 'end' ? mx - 6 : mx + 6;
+    svg += '<text x="' + tx + '" y="' + (T + 12) + '" font-size="12" font-weight="600" text-anchor="' + anchor +
+           '" fill="#dc2626">Mean = ' + round(mean) + '</text>';
+
+    svg += '</svg>';
+    chartEl.innerHTML = svg;
+  }
+
+  function clearChart() {
+    chartEl.innerHTML = '';
+    tooltip.classList.add('hidden');
+  }
+
+  // tooltip: X = value, P(X=value) = probability
+  chartEl.addEventListener('mouseover', e => {
+    const bar = e.target.closest('.bar');
+    if (!bar) return;
+    tooltip.textContent = 'X = ' + bar.dataset.k + ', P(X=' + bar.dataset.k + ') = ' + formatProb(Number(bar.dataset.p));
+    tooltip.classList.remove('hidden');
+  });
+  chartEl.addEventListener('mousemove', e => {
+    const r = chartWrap.getBoundingClientRect();
+    tooltip.style.left = (e.clientX - r.left) + 'px';
+    tooltip.style.top = (e.clientY - r.top) + 'px';
+  });
+  chartEl.addEventListener('mouseleave', () => tooltip.classList.add('hidden'));
+  chartEl.addEventListener('click', e => {           // touch screens
+    const bar = e.target.closest('.bar');
+    if (!bar) return;
+    const r = chartWrap.getBoundingClientRect();
+    tooltip.textContent = 'X = ' + bar.dataset.k + ', P(X=' + bar.dataset.k + ') = ' + formatProb(Number(bar.dataset.p));
+    tooltip.style.left = (e.clientX - r.left) + 'px';
+    tooltip.style.top = (e.clientY - r.top) + 'px';
+    tooltip.classList.remove('hidden');
+  });
+
+  function update() {
+    const { valid, n, p } = readInputs();
+
+    if (!valid) {
+      document.getElementById('selected').innerHTML =
+        'Selected: <strong>please enter valid values for n and p</strong>';
+      clearStats();
+      document.getElementById('pmf-substituted').classList.add('hidden');
+      document.getElementById('pmf-result').textContent = '';
+      document.getElementById('pmf-meaning').textContent = '';
+      kError.textContent = 'Fix n and p first.';
+      cError.textContent = 'Fix n and p first.';
+      clearCDF();
+      clearChart();
+      return;
+    }
+
+    renderSelected(n, p);
+    renderStats(n, p);
+    renderPMF(n, p);
+    renderCDF(n, p);
+    renderChart(n, p);
+  }
+
+  [nInput, pInput, kInput, cInput].forEach(el => el.addEventListener('input', update));
+  update();
+</script>
+</body>
+</html>

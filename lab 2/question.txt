@@ -1,0 +1,2 @@
+in class of 100 studes 60 criket 40 play foot ball and 25 play both find 
+p(F/C) and p(C/F)
