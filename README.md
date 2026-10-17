@@ -353,22 +353,21 @@ observed failure rate = 27/1200 = 0.0225, and average alerts per interval = 36/1
 | Step | Module | Inputs | What to do |
 |---|---|---|---|
 | 1 | Binomial | n = 100, p = 0.0225 | Compute P(X = 3) failures and view the PMF. Expected failures = 2.25. |
-<img width="1052" height="380" alt="geomectric X=1" src="https://github.com/user-attachments/assets/f137f445-d8a0-40df-932c-8339b001508d" />
+<img width="526" height="380" alt="binomial" src="https://github.com/user-attachments/assets/4c662c24-94aa-4773-a681-69d581f290b3" />
 | 2 | Poisson | λ = 3 | Compute P(0), P(1), P(2), P(3) and higher counts. P(X = 5) ≈ 0.1008. |
-<img width="1052" height="380" alt="geomectric X=1" src="https://github.com/user-attachments/assets/7b23fae8-2ca5-4ca9-ae00-eb993d0607df" />
-<img width="1052" height="380" alt="geomectric X=1" src="https://github.com/user-attachments/assets/9eafb432-59cd-4a22-99b4-2ee7ce53580a" />
-<img width="1052" height="380" alt="geomectric X=1" src="https://github.com/user-attachments/assets/7d610cc9-10f7-4229-879a-e7f6a440231c" />
-<img width="1052" height="380" alt="geomectric X=1" src="https://github.com/user-attachments/assets/092f4d8f-85ed-46d8-b1a4-a803eaac339f" />
-
+<img width="526" height="380" alt="poisonsX=0" src="https://github.com/user-attachments/assets/21c2565f-4abe-4620-a6ff-b264cc35ee80" />
+<img width="526" height="380" alt="poisonsX=1" src="https://github.com/user-attachments/assets/6bf80178-91af-47d6-a427-df04fcf1c863" />
+<img width="526" height="380" alt="poisonsX=2" src="https://github.com/user-attachments/assets/286969af-a390-44aa-be6d-e3bb1cab3afe" />
+<img width="526" height="380" alt="poisonsX=3" src="https://github.com/user-attachments/assets/e2a3abfe-b92f-46aa-a197-588cc0049451" />
 | 3 | Poisson | λ = 2, 3, 5 | Compare the three graphs and observe the shift. |
-<img width="1052" height="380" alt="geomectric X=1" src="https://github.com/user-attachments/assets/4900cc29-798a-4dd4-8d60-f671e7463285" />
-<img width="1052" height="380" alt="geomectric X=1" src="https://github.com/user-attachments/assets/72135c96-89fe-4fd5-a607-3c781f325b1b" />
-<img width="1052" height="380" alt="geomectric X=1" src="https://github.com/user-attachments/assets/b7bb0a70-4757-408f-94ac-406e6018093e" />
-| 4 | Geometric | p = 0.8 | Compute success on the 1st, 2nd and 3rd attempt. P(X = 3) = 0.032 and E[X] = 1.25. |
-<img width="1052" height="380" alt="geomectric X=1" src="https://github.com/user-attachments/assets/046c3fbf-c45d-46bf-8b1c-f664ea0be2dc" />
-<img width="1052" height="380" alt="geomectric X=1" src="https://github.com/user-attachments/assets/88418b9d-3ac4-4ff6-abfe-ecf2787863dc" />
-<img width="1052" height="380" alt="geomectric X=1" src="https://github.com/user-attachments/assets/c236f404-74bf-44e2-a8a8-83d7f45d6dfd" />
+<img width="526" height="380" alt="poisons labmda=2" src="https://github.com/user-attachments/assets/2b08c396-48a8-4c1c-8221-8c5af2a0e313" />
+<img width="526" height="380" alt="poisons lambda =3" src="https://github.com/user-attachments/assets/436dcc80-7c8e-4a8a-8de4-9847eb098401" />
+<img width="526" height="380" alt="poisons lambda =5" src="https://github.com/user-attachments/assets/e420bd82-727c-4ad0-842a-561997910542" />
 
+| 4 | Geometric | p = 0.8 | Compute success on the 1st, 2nd and 3rd attempt. P(X = 3) = 0.032 and E[X] = 1.25. |
+<img width="512" height="380" alt="geo(k=1)" src="https://github.com/user-attachments/assets/ae273195-2089-4157-8c88-68fc15ccc713" />
+<img width="512" height="380" alt="geo (k=2)" src="https://github.com/user-attachments/assets/5de9fda5-768e-4c33-9201-e7b095cd2ebd" />
+<img width="512" height="380" alt="gep k=3" src="https://github.com/user-attachments/assets/f833b39a-5827-4989-8885-b4c40264b568" />
 
 > The retry probability (p = 0.8) is an assumed parameter, not estimated from the monitoring table. Real retries may be dependent, particularly during an outage.
 
