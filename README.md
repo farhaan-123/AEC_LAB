@@ -181,4 +181,246 @@ X = value
 P(X=value) = probability
 Update the graph automatically whenever n or p changes.
 ```
+# Discrete Probability Distributions Explorer
+
+An interactive educational web application for exploring the **Binomial**, **Poisson** and **Geometric** distributions. Built for **Lab Program 2** (Module 2, CO2) of the *Statistical Data Analysis & Visualization* laboratory, Semester III.
+
+Change a distribution's parameters and instantly see its statistics, probabilities and PMF graph update.
+
+> **Aim of the lab:** to compute and visualize discrete probability distributions, and to calculate their expectations, moments and variance using real-world, ML-relevant examples.
+
+---
+
+## Table of Contents
+
+- [Features](#features)
+- [Distributions Covered](#distributions-covered)
+- [Formulas Used](#formulas-used)
+- [Getting Started](#getting-started)
+- [Usage](#usage)
+- [Lab Exercises](#lab-exercises)
+- [Verification Values](#verification-values)
+- [Project Structure](#project-structure)
+- [Tech Stack](#tech-stack)
+- [Author and Acknowledgements](#author-and-acknowledgements)
+- [License](#license)
+
+---
+
+## Features
+
+The app has four navigation items: **Home**, **Binomial**, **Poisson** and **Geometric**. Each distribution tab provides the same five sections:
+
+1. **Parameter inputs** with validation and a clear display of the selected values
+2. **Statistics cards:** Mean, Variance, Standard Deviation, Second Moment E[X²] and Skewness
+3. **PMF calculator:** P(X = k), with the formula and a one-line plain-English meaning
+4. **CDF calculator:** P(X ≤ k) and P(X > k)
+5. **PMF bar chart** with a dashed vertical line at the mean and a hover tooltip, updating live as parameters change
+
+Other highlights:
+
+- Inline validation, so invalid input never produces `NaN` or a crash
+- Numerically stable probability calculations (no raw factorial overflow for large n or k)
+- Clean, responsive layout that works on laptop and phone
+- Runs entirely in the browser, with no backend
+
+---
+
+## Distributions Covered
+
+| Distribution | Main question | ML / industry example |
+|---|---|---|
+| **Binomial**(n, p) | How many successes occur in n trials? | Number of correct predictions out of 20; defective products in a batch |
+| **Poisson**(λ) | How many events occur in a fixed interval? | Anomalies per hour; security alerts per 10 minutes |
+| **Geometric**(p) | How many trials until the first success? | Attempts until the first successful candidate; retries until a request succeeds |
+
+A simple way to remember them:
+
+- Binomial → **count successes**
+- Poisson → **count events**
+- Geometric → **count attempts**
+
+---
+
+## Formulas Used
+
+| | Binomial(n, p) | Poisson(λ) | Geometric(p) |
+|---|---|---|---|
+| **Support** | k = 0, 1, …, n | k = 0, 1, 2, … | k = 1, 2, 3, … |
+| **PMF** | C(n,k) pᵏ (1−p)ⁿ⁻ᵏ | e⁻λ λᵏ / k! | (1−p)ᵏ⁻¹ p |
+| **Mean** | np | λ | 1/p |
+| **Variance** | np(1−p) | λ | (1−p)/p² |
+| **Skewness** | (1−2p) / √(np(1−p)) | 1/√λ | (2−p) / √(1−p) |
+| **P(X ≤ k)** | Σ PMF(i), i = 0..k | Σ PMF(i), i = 0..k | 1 − (1−p)ᵏ |
+| **P(X > k)** | 1 − P(X ≤ k) | 1 − P(X ≤ k) | (1−p)ᵏ |
+
+Common to all three:
+
+- Standard deviation = √Variance
+- Second moment: E[X²] = Variance + Mean²
+
+The Geometric distribution here uses the **"number of trials until the first success"** definition (support starting at 1), matching `scipy.stats.geom`.
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- A modern web browser (Chrome, Edge, Firefox or Safari)
+- *(Optional)* Node.js, if the project uses a build step
+
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/<your-username>/<your-repo-name>.git
+cd <your-repo-name>
+```
+
+### Run the app
+
+**If the project is plain HTML/CSS/JS:** open `index.html` in your browser, or serve it locally:
+
+```bash
+# Python
+python -m http.server 8000
+# then visit http://localhost:8000
+```
+
+**If the project uses Node (for example React or Vite):**
+
+```bash
+npm install
+npm run dev
+```
+
+> Update this section to match how your project is actually built and run.
+
+---
+
+## Usage
+
+1. Open the app and pick a distribution from the header (**Binomial**, **Poisson** or **Geometric**).
+2. Enter the parameters. Inputs are validated as you type.
+3. Read the statistics cards for the mean, variance, standard deviation, E[X²] and skewness.
+4. Enter a value of **k** in the PMF and CDF calculators to get P(X = k), P(X ≤ k) and P(X > k).
+5. Study the PMF graph. Hover over a bar to see its exact probability, and watch the dashed line mark the mean.
+
+### Default values
+
+| Distribution | Default parameters |
+|---|---|
+| Binomial | n = 20, p = 0.35 |
+| Poisson | λ = 4 |
+| Geometric | p = 0.25 |
+
+### Input validation
+
+| Distribution | Parameter rules | Rules for k |
+|---|---|---|
+| Binomial | n is a positive integer; 0 ≤ p ≤ 1 | integer, 0 ≤ k ≤ n |
+| Poisson | λ > 0 | integer, k ≥ 0 |
+| Geometric | 0 < p ≤ 1 | integer, k ≥ 1 |
+
+---
+
+## Lab Exercises
+
+These exercises follow the lab sheet and use the app instead of Python code. For each one, record your numerical results, graph observations and an inference.
+
+### Use case 1: Manufacturing quality control
+
+An AI vision system classifies each product as defective or non-defective (assumed defect probability p = 0.05).
+
+| Step | Module | Inputs | What to do |
+|---|---|---|---|
+| 1 | Binomial | n = 20, p = 0.05 | Note the mean and variance, and compute P(X = 2). The lab sheet gives P(X = 2) ≈ 0.1887 and an expected 1 defect per batch. |<img width="1052" height="380" alt="binomial p=0 05" src="https://github.com/user-attachments/assets/578ac46d-69bc-4047-b08c-8bc41fc36317" />
+
+| 2 | Binomial | n = 20, p = 0.10 | Observe how the distribution shifts toward larger defect counts. |
+<img width="1052" height="380" alt="binomial p=0 10" src="https://github.com/user-attachments/assets/ef57dd5d-412c-48e6-b052-ad13097d4b3f" />
+
+| 3 | Poisson | λ = 5 (5 defects per 100 products) | Compute P(X = 3) ≈ 0.1404 and compare with the Binomial results. |<img width="1052" height="380" alt="poisons lambda=5" src="https://github.com/user-attachments/assets/345f01f2-2963-4b35-a1ed-d9133194e7f8" />
+
+| 4 | Geometric | p = 0.05 | Examine the chance of the first defect on different inspections. The expected wait is 20 inspections. |<img width="1052" height="380" alt="geomectric X=1" src="https://github.com/user-attachments/assets/057beb51-5b9a-409a-9e0e-7758431c67f7" />
+
+
+### Use case 2: Cloud operations and cybersecurity monitoring
+
+Based on 12 ten-minute monitoring intervals (1,200 API requests, 27 failures, 36 security alerts):
+observed failure rate = 27/1200 = 0.0225, and average alerts per interval = 36/12 = 3.
+
+| Step | Module | Inputs | What to do |
+|---|---|---|---|
+| 1 | Binomial | n = 100, p = 0.0225 | Compute P(X = 3) failures and view the PMF. Expected failures = 2.25. |
+<img width="526" height="380" alt="binomial" src="https://github.com/user-attachments/assets/4c662c24-94aa-4773-a681-69d581f290b3" />
+| 2 | Poisson | λ = 3 | Compute P(0), P(1), P(2), P(3) and higher counts. P(X = 5) ≈ 0.1008. |
+<img width="526" height="380" alt="poisonsX=0" src="https://github.com/user-attachments/assets/21c2565f-4abe-4620-a6ff-b264cc35ee80" />
+<img width="526" height="380" alt="poisonsX=1" src="https://github.com/user-attachments/assets/6bf80178-91af-47d6-a427-df04fcf1c863" />
+<img width="526" height="380" alt="poisonsX=2" src="https://github.com/user-attachments/assets/286969af-a390-44aa-be6d-e3bb1cab3afe" />
+<img width="526" height="380" alt="poisonsX=3" src="https://github.com/user-attachments/assets/e2a3abfe-b92f-46aa-a197-588cc0049451" />
+| 3 | Poisson | λ = 2, 3, 5 | Compare the three graphs and observe the shift. |
+<img width="526" height="380" alt="poisons labmda=2" src="https://github.com/user-attachments/assets/2b08c396-48a8-4c1c-8221-8c5af2a0e313" />
+<img width="526" height="380" alt="poisons lambda =3" src="https://github.com/user-attachments/assets/436dcc80-7c8e-4a8a-8de4-9847eb098401" />
+<img width="526" height="380" alt="poisons lambda =5" src="https://github.com/user-attachments/assets/e420bd82-727c-4ad0-842a-561997910542" />
+
+| 4 | Geometric | p = 0.8 | Compute success on the 1st, 2nd and 3rd attempt. P(X = 3) = 0.032 and E[X] = 1.25. |
+<img width="512" height="380" alt="geo(k=1)" src="https://github.com/user-attachments/assets/ae273195-2089-4157-8c88-68fc15ccc713" />
+<img width="512" height="380" alt="geo (k=2)" src="https://github.com/user-attachments/assets/5de9fda5-768e-4c33-9201-e7b095cd2ebd" />
+<img width="512" height="380" alt="gep k=3" src="https://github.com/user-attachments/assets/f833b39a-5827-4989-8885-b4c40264b568" />
+
+> The retry probability (p = 0.8) is an assumed parameter, not estimated from the monitoring table. Real retries may be dependent, particularly during an outage.
+
+### Other worked examples from the lab sheet
+
+- **Binomial, ML classification:** 20 images, p = 0.35 → mean 7 correct classifications. P(X ≤ 10) and P(X = 7) are the lab's CDF and PMF examples.
+- **Geometric, candidate generation:** p = 0.3 → E[X] = 3.3333, P(X = 1) = 0.3 and P(X > 5) = 0.7⁵ ≈ 0.1681.
+
+---
+
+## Verification Values
+
+Use these to confirm the app calculates correctly. These are derived from the formulas above.
+
+| Case | Expected results |
+|---|---|
+| **Binomial**, n = 20, p = 0.35 | Mean 7, Variance 4.55, Std ≈ 2.1331, E[X²] = 53.55, Skewness ≈ 0.1406 |
+| **Poisson**, λ = 4 | Mean 4, Variance 4, Std 2, E[X²] = 20, Skewness 0.5, P(X = 3) ≈ 0.195367, P(X ≤ 3) ≈ 0.433470 |
+| **Geometric**, p = 0.25 | Mean 4, Variance 12, Std ≈ 3.4641, E[X²] = 28, Skewness ≈ 2.0207, P(X = 3) = 0.140625, P(X ≤ 3) = 0.578125 |
+| **Geometric**, p = 0.3 | Mean ≈ 3.3333, P(X = 1) = 0.3, P(X > 5) ≈ 0.1681 |
+
+Sanity checks that should always hold:
+
+- PMF values sum to approximately 1 across the plotted range
+- P(X ≤ k) + P(X > k) = 1 for every k
+
+---
+
+## Project Structure
+
+
+.
+├── index.html          # App shell and navigation
+├── css/
+│   └── styles.css      # Styling
+├── js/
+│   ├── main.js         # Tab navigation and shared utilities
+│   ├── binomial.js     # Binomial module
+│   ├── poisson.js      # Poisson module
+│   └── geometric.js    # Geometric module
+└── README.md
+```
+
+---
+
+
+---
+
+## Author and Acknowledgements
+
+- **Author:** *FARHAAN AHMED*
+- **Course:** Statistical Data Analysis & Visualization Laboratory, Semester III
+- **Lab Program 2** designed by Prof. Sanjay M. Belgaonkar
+
+---
 
